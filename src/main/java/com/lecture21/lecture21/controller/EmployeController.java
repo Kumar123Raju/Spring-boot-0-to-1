@@ -6,6 +6,8 @@ import com.lecture21.lecture21.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/employees")
 public class EmployeController {
@@ -23,10 +25,17 @@ public class EmployeController {
         return employeeService.getEmployee(id);
 
     }
+    @GetMapping("/getAllEmployees")
+    public List<EmployeEntities> getAllEmployees(){
+        return employeeService.getAllEmployee();
+    }
 
-    @PostMapping("/settEmployees")
+    @PostMapping("/setEmployees")
     public EmployeEntities setEmployees(@RequestBody EmployeEntities emp){
          return employeeService.setEmployee(emp);
     }
+
+
+
 
 }

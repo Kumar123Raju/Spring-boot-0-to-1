@@ -6,6 +6,8 @@ import com.lecture21.lecture21.repositories.EmployeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class EmployeeService {
 
@@ -24,4 +26,13 @@ public class EmployeeService {
     public EmployeEntities setEmployee(EmployeEntities emp) {
         return employeRepository.save(emp);
     }
+
+    public List<EmployeEntities> getAllEmployee() {
+        return employeRepository.findAll();
+    }
+
+
+
+
+
 }
