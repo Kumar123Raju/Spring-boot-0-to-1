@@ -3,10 +3,13 @@ package com.lecture21.lecture21.service;
 import com.lecture21.lecture21.dto.EmployeDto;
 import com.lecture21.lecture21.entities.EmployeEntities;
 import com.lecture21.lecture21.repositories.EmployeRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class EmployeeService {
@@ -16,19 +19,34 @@ public class EmployeeService {
 
     @Autowired
     private  EmployeRepository employeRepository;
+    @Autowired
+    private ModelMapper modelMapper;
 
 
-    public EmployeEntities getEmployee(Integer id){
+    public EmployeDto getEmployee(Integer id){
 
-        return employeRepository.findById(id).orElse(null);
+         EmployeEntities employeEntities=employeRepository.findById(id).orElse(null);
+         return modelMapper.map(employeEntities,EmployeDto.class);
     }
 
-    public EmployeEntities setEmployee(EmployeEntities emp) {
-        return employeRepository.save(emp);
+    public EmployeDto setEmployee(EmployeDto emp) {
+        EmployeEntities saveit=modelMapper.map(emp,EmployeEntities.class);
+        EmployeEntities savedEmployee=employeRepository.save(saveit);
+        return modelMapper.map(savedEmployee,EmployeDto.class);
     }
 
-    public List<EmployeEntities> getAllEmployee() {
-        return employeRepository.findAll();
+    public List<EmployeDto> getAllEmployee() {
+        List<EmployeEntities> employeEntitiesList=employeRepository.findAll();
+
+        if (employeEntitiesList.isEmpty()) {
+            return Collections.emptyList(); // Return empty list if database is empty
+        }
+
+
+        return employeEntitiesList
+                .stream()
+                .map(employeEntities1->modelMapper.map(employeEntities1,EmployeDto.class))
+                .collect(Collectors.toList());
     }
 
 
