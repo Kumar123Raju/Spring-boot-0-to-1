@@ -5,10 +5,17 @@ import com.lecture21.lecture21.entities.EmployeEntities;
 import com.lecture21.lecture21.repositories.EmployeRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.ReflectionUtils;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
+import java.lang.reflect.Field;
+import java.security.Key;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,10 +30,18 @@ public class EmployeeService {
     private ModelMapper modelMapper;
 
 
-    public EmployeDto getEmployee(Integer id){
 
-         EmployeEntities employeEntities=employeRepository.findById(id).orElse(null);
-         return modelMapper.map(employeEntities,EmployeDto.class);
+
+    public boolean isExistByEmployeId(Integer employeeId){
+        return employeRepository.existsById(employeeId);
+    }
+
+    public EmployeDto getEmployee(Integer id){
+        boolean isExist=employeRepository.existsById(id);
+        if(!isExist) return null;
+        return modelMapper.map(employeRepository.findById(id),EmployeDto.class);
+
+
     }
 
     public EmployeDto setEmployee(EmployeDto emp) {
@@ -50,7 +65,32 @@ public class EmployeeService {
     }
 
 
+    public EmployeDto updateEmployee(EmployeDto emp,Integer id) {
+         EmployeEntities employeEntities=modelMapper.map(emp,EmployeEntities.class);
+         employeEntities.setId(id);
+         EmployeEntities updatedEmployees=employeRepository.save(employeEntities);
+         return modelMapper.map(updatedEmployees,EmployeDto.class);
 
+    }
 
+    public Boolean  deleteEmployee(Integer id) {
+        EmployeEntities employeEntities=employeRepository.findById(id).orElse(null);
+        if(employeEntities==null) return false;
+        employeRepository.deleteById(id);
+        return true;
+    }
 
+    public EmployeDto updatePartialEmployee(Map<String, Object> updates, Integer id) {
+        boolean isExist=isExistByEmployeId(id);
+        if(!isExist) return null;
+        EmployeEntities employeEntities=employeRepository.findById(id).get();
+
+        updates.forEach((key,value)->{
+            Field fieldToBeUpdated=ReflectionUtils.findRequiredField(EmployeEntities.class,key);
+            fieldToBeUpdated.setAccessible(true);
+            ReflectionUtils.setField(fieldToBeUpdated,employeEntities,value);
+        });
+        return modelMapper.map(employeRepository.save(employeEntities),EmployeDto.class);
+
+    }
 }
