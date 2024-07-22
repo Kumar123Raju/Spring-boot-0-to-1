@@ -7,6 +7,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,7 +40,7 @@ public class EmployeController {
     }
 
     @PostMapping("/setEmployees")
-    public ResponseEntity<EmployeDto> setEmployees(@RequestBody EmployeDto emp){
+    public ResponseEntity<EmployeDto> setEmployees(@RequestBody @Validated EmployeDto emp){
         EmployeDto employeDto= employeeService.setEmployee(emp);
         return new ResponseEntity<>(employeDto, HttpStatus.CREATED);
     }
