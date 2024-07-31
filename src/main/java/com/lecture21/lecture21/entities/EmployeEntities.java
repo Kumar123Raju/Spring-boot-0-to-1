@@ -20,6 +20,8 @@ public class EmployeEntities {
     String location;
     String email;
     String role;
-    double salary;
+//    double salary;
 
+    public void setId(Integer id) {
+    }
 }

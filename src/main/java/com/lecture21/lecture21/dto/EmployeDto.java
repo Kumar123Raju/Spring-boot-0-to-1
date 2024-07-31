@@ -27,11 +27,11 @@ public class EmployeDto {
     String location;
     @Email(message = "Email is Invalid")
     String email;
-    @Max(value = 50000,message = "Salary is not more than 50K")
-    @NotNull
-    @Positive
-    @Digits(integer = 6,fraction = 2,message="Salary is allowed only in This formate: xxxxxx.yy")
-    double salary;
+//    @Max(value = 50000,message = "Salary is not more than 50K")
+//    @NotNull
+//    @Positive
+//    @Digits(integer = 6,fraction = 2,message="Salary is allowed only in This formate: xxxxxx.yy")
+//    double salary;
 
 
 }

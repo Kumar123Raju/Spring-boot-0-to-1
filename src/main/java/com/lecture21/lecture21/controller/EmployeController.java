@@ -2,6 +2,7 @@ package com.lecture21.lecture21.controller;
 
 import com.lecture21.lecture21.dto.EmployeDto;
 import com.lecture21.lecture21.entities.EmployeEntities;
+import com.lecture21.lecture21.exceptions.ResourceNotFoundException;
 import com.lecture21.lecture21.service.EmployeeService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @RestController
 @RequestMapping("/employees")
@@ -28,11 +27,19 @@ public class EmployeController {
 
     @GetMapping("/getEmployees/{id}")
     public ResponseEntity<EmployeDto> getEmployee(@PathVariable Integer id) {
-       EmployeDto employeDto= employeeService.getEmployee(id);
-       if(employeDto==null) return ResponseEntity.notFound().build();
-       return ResponseEntity.ok(employeDto);
+//       EmployeDto employeDto= employeeService.getEmployee(id);
+//       if(employeDto==null) return ResponseEntity.notFound().build();
+//       return ResponseEntity.ok(employeDto);
+        Optional<EmployeDto> employeDto= employeeService.getEmployee(id);
+        return employeDto
+                .map(employeDto1 -> ResponseEntity.ok(employeDto1))
+                .orElseThrow(()->new ResourceNotFoundException("Employee not found with id: "+id));
 
     }
+
+
+
+
     @GetMapping("/getAllEmployees")
     public ResponseEntity<List<EmployeDto>> getAllEmployees(){
         List<EmployeDto> employeDtos= employeeService.getAllEmployee();

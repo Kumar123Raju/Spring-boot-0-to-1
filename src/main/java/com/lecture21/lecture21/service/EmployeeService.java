@@ -2,6 +2,7 @@ package com.lecture21.lecture21.service;
 
 import com.lecture21.lecture21.dto.EmployeDto;
 import com.lecture21.lecture21.entities.EmployeEntities;
+import com.lecture21.lecture21.exceptions.ResourceNotFoundException;
 import com.lecture21.lecture21.repositories.EmployeRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.lang.reflect.Field;
 import java.security.Key;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,10 +34,11 @@ public class EmployeeService {
         return employeRepository.existsById(employeeId);
     }
 
-    public EmployeDto getEmployee(Integer id){
-        boolean isExist=employeRepository.existsById(id);
-        if(!isExist) return null;
-        return modelMapper.map(employeRepository.findById(id),EmployeDto.class);
+    public Optional<EmployeDto> getEmployee(Integer id){
+//        boolean isExist=employeRepository.existsById(id);
+//        if(!isExist) return null;
+//        return modelMapper.map(employeRepository.findById(id),EmployeDto.class);
+        return employeRepository.findById(id).map(employeeEntity -> modelMapper.map(employeeEntity, EmployeDto.class));
 
 
     }
@@ -66,6 +65,8 @@ public class EmployeeService {
 
 
     public EmployeDto updateEmployee(EmployeDto emp,Integer id) {
+        boolean isExist=isExistByEmployeId(id);
+        if(!isExist) throw new ResourceNotFoundException("Employee not found with id: "+id);
          EmployeEntities employeEntities=modelMapper.map(emp,EmployeEntities.class);
          employeEntities.setId(id);
          EmployeEntities updatedEmployees=employeRepository.save(employeEntities);
@@ -75,7 +76,7 @@ public class EmployeeService {
 
     public Boolean  deleteEmployee(Integer id) {
         EmployeEntities employeEntities=employeRepository.findById(id).orElse(null);
-        if(employeEntities==null) return false;
+        if(employeEntities==null) throw new ResourceNotFoundException("Employee not found with id: "+id);
         employeRepository.deleteById(id);
         return true;
     }
